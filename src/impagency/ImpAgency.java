@@ -1,8 +1,8 @@
 /*
- * This programme that imports agencies from a file in xml format
- * into the database.
- * @version May 2016
- * @author Thierry Baribaud
+ * Ce programme importe les agences décrites dans un fichier au format XML
+ * dans la base de données.
+ * @version Mai 2016.
+ * @author Thierry Baribaud.
  */
 package impagency;
 
@@ -25,6 +25,9 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import liba2pi.ApplicationProperties;
+import liba2pi.DBServer;
+import liba2pi.DBServerException;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -35,9 +38,50 @@ import org.xml.sax.SAXException;
 public class ImpAgency {
 
     /**
-     * @param args the command line arguments
+     * SourceServer : prod pour le serveur de production, dev pour le serveur de
+     * développement. Valeur par défaut : dev.
      */
-    public static void main(String[] args) {
+    private String SourceServer = "dev";
+
+    /**
+     * FileIn : fichier contenant les données à charger.
+     * Valeur par défaut : doit être spécifié en ligne de commande.
+     */
+    private String FileIn = "agences_in.xml";
+
+    /**
+     * FileOut : fichier qui recevra les résultats du chargement.
+     * Valeur par défaut : agences_out.xml.
+     */
+    private String FileOut = "agences_out.xml";
+
+    /**
+     * debugMode : fonctionnement du programme en mode debug (true/false).
+     * Valeur par défaut : false.
+     */
+    private boolean debugMode = false;
+
+    /**
+     * testMode : fonctionnement du programme en mode test (true/false). Valeur
+     * par défaut : false.
+     */
+    private boolean testMode = false;
+
+    /**
+     * Les arguments en ligne de commande permettent de changer le mode de
+     * fonctionnement. 
+     * -i fichier : fichier dans lequel trouver les données de
+     * l'agence (obligatoire). 
+     * -o fichier : fichier vers lequel exporter les
+     * données de l'agence (optionnel, nom par défaut agences.xml). 
+     * -d : le programme fonctionne en mode débug, il est plus verbeux (optionnel). 
+     * -t : le programme fonctionne en mode de test, les transactions en base de
+     * données ne sont pas exécutées (optionnel).
+     *
+     * @param Args arguments de la ligne de commande.
+     */
+    public ImpAgency(String[] Args) throws ImpAgencyException, IOException, DBServerException {
+
         Fagency MyFagency;
 
         DocumentBuilderFactory MyFactoryIn;
@@ -84,17 +128,30 @@ public class ImpAgency {
         DOMSource MySource;
         StreamResult MyOutput;
 
-        String FilenameIn = "agences.xml";
-        String FilenameOut = "ImpAgencyResults.xml";
+        ApplicationProperties MyApplicationProperties;
+        DBServer MyDBServer;
 
         MyFactoryIn = DocumentBuilderFactory.newInstance();
         MyFactoryOut = DocumentBuilderFactory.newInstance();
-        try {
+
+        // On récupère les arguments de la ligne de commande.
+        System.out.println("Récupération des arguments en ligne de commande ...");
+        getArgs(Args);
+
+        System.out.println("Lecture du fichier de paramètres ...");
+        MyApplicationProperties = new ApplicationProperties("ImpAgencyPublic.prop");
+
+        System.out.println("Lecture des paramètres de base de données ...");
+        MyDBServer = new DBServer(getSourceServer(),
+                                  MyApplicationProperties);
+        System.out.println("  " + MyDBServer);
+        
+       try {
             MyBuilderIn = MyFactoryIn.newDocumentBuilder();
             MyBuilderOut = MyFactoryIn.newDocumentBuilder();
 
-            System.out.println("Lecture du fichier " + FilenameIn);
-            MyDocumentIn = MyBuilderIn.parse(new File(FilenameIn));
+            System.out.println("Lecture du fichier " + FileIn);
+            MyDocumentIn = MyBuilderIn.parse(new File(FileIn));
             MyDocumentOut = MyBuilderOut.newDocument();
 
             //Affiche la version de XML
@@ -601,7 +658,7 @@ public class ImpAgency {
             MyTransformer = MyTransformerFactory.newTransformer();
 
             MySource = new DOMSource(MyDocumentOut);
-            MyOutput = new StreamResult(new File(FilenameOut));
+            MyOutput = new StreamResult(new File(FileOut));
 
             // Prologue
             MyTransformer.setOutputProperty(OutputKeys.VERSION, "1.0");
@@ -614,7 +671,7 @@ public class ImpAgency {
 
             // Output
             MyTransformer.transform(MySource, MyOutput);
-            System.out.println("Fichier élément(s) à retraiter " + FilenameOut);
+            System.out.println("Fichier élément(s) à retraiter " + FileOut);
 
         } catch (ParserConfigurationException MyException) {
             Logger.getLogger(ImpAgency.class.getName()).log(Level.SEVERE, null, MyException);
@@ -630,5 +687,175 @@ public class ImpAgency {
             System.out.println("Problem writing XML document " + MyException);
         }
 
+    }
+
+  /**
+   * @param MySourceServer : définit le serveur source.
+   */
+  private void setSourceServer(String MySourceServer) {
+    this.SourceServer = MySourceServer;
+  }
+
+  /**
+   * @param MyFileIn : définit le fichier où prendre les données.
+   */
+  private void setFileIn(String MyFileIn) {
+    this.FileIn = MyFileIn;
+  }
+
+  /**
+   * @param MyFileOut : définit le fichier où envoyer les résultats.
+   */
+  private void setFileOut(String MyFileOut) {
+    this.FileOut = MyFileOut;
+  }
+
+  /**
+    * debugMode : fonctionnement du programme en mode debug (true/false).
+   */
+  private void setDebugMode(boolean myDebugMode) {
+    this.debugMode = myDebugMode;
+  }
+
+  /**
+    * testMode : fonctionnement du programme en mode test (true/false).
+   */
+  private void setTestMode(boolean myTestMode) {
+    this.testMode = myTestMode;
+  }
+
+  /**
+   * @return SourceServer : retourne la valeur pour le serveur source.
+   */
+  private String getSourceServer() {
+    return(SourceServer);
+  }
+
+  /**
+   * @return FileIn : retourne le nom du fichier où prendre les données.
+   */
+  private String getFileIn() {
+    return(FileIn);
+  }
+
+  /**
+   * @return FileOut : retourne le nom du fichier où envoyer les résultats.
+   */
+  private String getFileOut() {
+    return(FileOut);
+  }
+
+  /**
+   * @return daemonMode : retourne le mode de fonctionnement debug.
+   */
+  private boolean getDebugMode() {
+    return(debugMode);
+  }
+  
+  /**
+   * @return testMode : retourne le mode de fonctionnement test.
+   */
+  private boolean getTestMode() {
+    return(testMode);
+  }
+  
+  /**
+   * Récupère les arguments de la ligne de commande.
+   * @param Args arguments de la ligne de commande.
+   * @throws ImpAgencyException en cas d'erreur.
+   */
+    private void getArgs(String[] Args) throws ImpAgencyException {
+
+        String[] Errmsg = {"Erreur n°1 : Mauvaise source de données",
+            "Erreur n°2 : Mauvais fichier source",
+            "Erreur n°3 : Mauvais fichier résultat",
+            "Erreur n°4 : Mauvais argument"};
+        String ErrorValue = "";
+        int errNo = Errmsg.length;
+        short retcode;
+        int i;
+        int n;
+        int ip1;
+
+        retcode = 1;
+        n = Args.length;
+
+//        System.out.println("nargs=" + n);
+//    for(i=0; i<n; i++) System.out.println("args["+i+"]="+Args[i]);
+        i = 0;
+        while (i < n) {
+//            System.out.println("args[" + i + "]=" + Args[i]);
+            ip1 = i + 1;
+            if (Args[i].equals("-dbserver")) {
+                if (ip1 < n) {
+                    if (Args[ip1].equals("dev") || Args[ip1].equals("prod")) {
+                        setSourceServer(Args[ip1]);
+                    } else {
+                        errNo = 0;
+                        ErrorValue = Args[ip1];
+                    }
+                    i = ip1;
+                } else {
+                    errNo = 0;
+                    ErrorValue = "non défini";
+                }
+            } else if (Args[i].equals("-i")) {
+                if (ip1 < n) {
+                    setFileIn(Args[ip1]);
+                    i = ip1;
+                } else {
+                    errNo = 1;
+                    ErrorValue = "non défini";
+                }
+            } else if (Args[i].equals("-o")) {
+                if (ip1 < n) {
+                    setFileOut(Args[ip1]);
+                    i = ip1;
+                } else {
+                    errNo = 2;
+                    ErrorValue = "non défini";
+                }
+            } else if (Args[i].equals("-d")) {
+                setDebugMode(true);
+            } else if (Args[i].equals("-t")) {
+                setTestMode(true);
+            } else {
+                errNo = 3;
+                ErrorValue = Args[i];
+            }
+            i++;
+        }
+//        System.out.println("errNo=" + errNo);
+        if (errNo != Errmsg.length) {
+            throw new ImpAgencyException(Errmsg[errNo] + " : " + ErrorValue);
+        }
+    }
+   
+    /**
+     * Les arguments en ligne de commande permettent de changer le mode de
+     * fonctionnement. 
+     * -i fichier : fichier dans lequel trouver les données de
+     * l'agence (obligatoire). 
+     * -o fichier : fichier vers lequel exporter les
+     * données de l'agence (optionnel, nom par défaut agences.xml). 
+     * -d : le programme fonctionne en mode débug, il est plus verbeux (optionnel). 
+     * -t : le programme fonctionne en mode de test, les transactions en base de
+     * données ne sont pas exécutées (optionnel).
+     *
+     * @param Args arguments de la ligne de commande.
+     */
+    public static void main(String[] Args) {
+        ImpAgency MyImpAgency;
+
+        System.out.println("Lancement de ImpAgency ...");
+
+        try {
+            MyImpAgency = new ImpAgency(Args);
+        }
+        catch (Exception MyException) {
+            System.out.println("Problème lors du lancement de ImpAgency");
+        }
+
+        System.out.println("Traitement terminé.");
     }
 }
