@@ -79,6 +79,9 @@ public class ImpAgency {
      * données ne sont pas exécutées (optionnel).
      *
      * @param Args arguments de la ligne de commande.
+     * @throws impagency.ImpAgencyException
+     * @throws java.io.IOException
+     * @throws liba2pi.DBServerException
      */
     public ImpAgency(String[] Args) throws ImpAgencyException, IOException, DBServerException {
 
@@ -103,7 +106,6 @@ public class ImpAgency {
         NodeList MyNodeList;
         Element MyElementIn;
         Element MyElementOut;
-        Element MyError;
         String MyString;
         String MyType;
         int count;
@@ -772,12 +774,10 @@ public class ImpAgency {
             "Erreur n°4 : Mauvais argument"};
         String ErrorValue = "";
         int errNo = Errmsg.length;
-        short retcode;
         int i;
         int n;
         int ip1;
 
-        retcode = 1;
         n = Args.length;
 
 //        System.out.println("nargs=" + n);
@@ -788,7 +788,7 @@ public class ImpAgency {
             ip1 = i + 1;
             if (Args[i].equals("-dbserver")) {
                 if (ip1 < n) {
-                    if (Args[ip1].equals("dev") || Args[ip1].equals("prod")) {
+                    if (Args[ip1].equals("dev") || Args[ip1].equals("prod") || Args[ip1].equals("mysql")) {
                         setSourceServer(Args[ip1]);
                     } else {
                         errNo = 0;
@@ -853,7 +853,7 @@ public class ImpAgency {
             MyImpAgency = new ImpAgency(Args);
         }
         catch (Exception MyException) {
-            System.out.println("Problème lors du lancement de ImpAgency");
+            System.out.println("Problème lors du lancement de ImpAgency" + MyException);
         }
 
         System.out.println("Traitement terminé.");
