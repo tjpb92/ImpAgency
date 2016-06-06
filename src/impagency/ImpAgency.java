@@ -1,12 +1,6 @@
-/*
- * Ce programme importe les agences dÃ©crites dans un fichier au format XML
- * dans la base de donnÃ©es.
- * @version Mai 2016.
- * @author Thierry Baribaud.
- */
 package impagency;
 
-import agency.Fagency;
+import bdd.Fagency;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
@@ -25,9 +19,9 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import liba2pi.ApplicationProperties;
-import liba2pi.DBServer;
-import liba2pi.DBServerException;
+import utils.ApplicationProperties;
+import utils.DBServer;
+import utils.DBServerException;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -35,53 +29,57 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+/*
+ * Ce programme importe les agences décrites dans un fichier au format XML
+ * dans la base de données.
+ * @version Juin 2016
+ * @author Thierry Baribaud
+ */
 public class ImpAgency {
 
     /**
      * SourceServer : prod pour le serveur de production, dev pour le serveur de
-     * dÃ©veloppement. Valeur par dÃ©faut : dev.
+     * développement. Valeur par défaut : dev.
      */
     private String SourceServer = "dev";
 
     /**
-     * FileIn : fichier contenant les donnÃ©es Ã  charger.
-     * Valeur par dÃ©faut : doit Ãªtre spÃ©cifiÃ© en ligne de commande.
+     * FileIn : fichier contenant les données à charger. Valeur par défaut :
+     * doit être spécifié en ligne de commande.
      */
     private String FileIn = "agences_in.xml";
 
     /**
-     * FileOut : fichier qui recevra les rÃ©sultats du chargement.
-     * Valeur par dÃ©faut : agences_out.xml.
+     * FileOut : fichier qui recevra les résultats du chargement. Valeur par
+     * défaut : agences_out.xml.
      */
     private String FileOut = "agences_out.xml";
 
     /**
      * debugMode : fonctionnement du programme en mode debug (true/false).
-     * Valeur par dÃ©faut : false.
+     * Valeur par défaut : false.
      */
     private boolean debugMode = false;
 
     /**
      * testMode : fonctionnement du programme en mode test (true/false). Valeur
-     * par dÃ©faut : false.
+     * par défaut : false.
      */
     private boolean testMode = false;
 
     /**
      * Les arguments en ligne de commande permettent de changer le mode de
-     * fonctionnement. 
-     * -i fichier : fichier dans lequel trouver les donnÃ©es de
-     * l'agence (obligatoire). 
-     * -o fichier : fichier vers lequel exporter les
-     * donnÃ©es de l'agence (optionnel, nom par dÃ©faut agences.xml). 
-     * -d : le programme fonctionne en mode dÃ©bug, il est plus verbeux (optionnel). 
-     * -t : le programme fonctionne en mode de test, les transactions en base de
-     * donnÃ©es ne sont pas exÃ©cutÃ©es (optionnel).
+     * fonctionnement. -i fichier : fichier dans lequel trouver les données de
+     * l'agence (obligatoire). -o fichier : fichier vers lequel exporter les
+     * données de l'agence (optionnel, nom par défaut agences.xml). -d : le
+     * programme fonctionne en mode débug, il est plus verbeux (optionnel). -t :
+     * le programme fonctionne en mode de test, les transactions en base de
+     * données ne sont pas exécutées (optionnel).
      *
      * @param Args arguments de la ligne de commande.
      * @throws impagency.ImpAgencyException
      * @throws java.io.IOException
-     * @throws liba2pi.DBServerException
+     * @throws utils.DBServerException
      */
     public ImpAgency(String[] Args) throws ImpAgencyException, IOException, DBServerException {
 
@@ -136,19 +134,19 @@ public class ImpAgency {
         MyFactoryIn = DocumentBuilderFactory.newInstance();
         MyFactoryOut = DocumentBuilderFactory.newInstance();
 
-        // On rÃ©cupÃ¨re les arguments de la ligne de commande.
-        System.out.println("RÃ©cupÃ©ration des arguments en ligne de commande ...");
+        // On récupère les arguments de la ligne de commande.
+        System.out.println("Récupération des arguments en ligne de commande ...");
         getArgs(Args);
 
-        System.out.println("Lecture du fichier de paramÃ¨tres ...");
-        MyApplicationProperties = new ApplicationProperties("ImpAgencyPublic.prop");
+        System.out.println("Lecture du fichier de paramètres ...");
+        MyApplicationProperties = new ApplicationProperties("MyDatabases.prop");
 
-        System.out.println("Lecture des paramÃ¨tres de base de donnÃ©es ...");
+        System.out.println("Lecture des paramètres de base de données ...");
         MyDBServer = new DBServer(getSourceServer(),
-                                  MyApplicationProperties);
+                MyApplicationProperties);
         System.out.println("  " + MyDBServer);
-        
-       try {
+
+        try {
             MyBuilderIn = MyFactoryIn.newDocumentBuilder();
             MyBuilderOut = MyFactoryIn.newDocumentBuilder();
 
@@ -195,17 +193,17 @@ public class ImpAgency {
                     nbError = 0;
                     nbWarning = 0;
 
-                    // RÃ©cupÃ¨re l'identifiant de l'agence
+                    // Récupère l'identifiant de l'agence
                     ElementName = "id";
                     error = false;
-                    ErrorMsg = "L'identifiant de l'agence doit Ãªtre numÃ©rique";
+                    ErrorMsg = "L'identifiant de l'agence doit être numérique";
                     warning = false;
-                    WarningMsg = "Identifiant non dÃ©fini";
+                    WarningMsg = "Identifiant non défini";
                     MyElementOut = MyDocumentOut.createElement(ElementName);
                     MyAgencyOut.appendChild(MyElementOut);
                     MyNodeList = OneAgency.getElementsByTagName(ElementName);
                     count = MyNodeList.getLength();
-//                    System.out.println("  " + count + " identifiant(s) trouvÃ©(s)");
+//                    System.out.println("  " + count + " identifiant(s) trouvé(s)");
                     if (count > 0) {
                         MyElementIn = (Element) MyNodeList.item(0);
                         MyString = MyElementIn.getTextContent();
@@ -233,17 +231,17 @@ public class ImpAgency {
                         System.out.println("  WARNING : " + WarningMsg);
                     }
 
-                    // RÃ©cupÃ¨re le client dont dÃ©pend l'agence
+                    // Récupère le client dont dépend l'agence
                     ElementName = "client";
                     error = false;
-                    ErrorMsg = "L'identifiant du client doit Ãªtre numÃ©rique";
+                    ErrorMsg = "L'identifiant du client doit être numérique";
                     warning = false;
                     WarningMsg = "";
                     MyElementOut = MyDocumentOut.createElement(ElementName);
                     MyAgencyOut.appendChild(MyElementOut);
                     MyNodeList = OneAgency.getElementsByTagName(ElementName);
                     count = MyNodeList.getLength();
-//                    System.out.println("  " + count + " client(s) trouvÃ©(s)");
+//                    System.out.println("  " + count + " client(s) trouvé(s)");
                     if (count > 0) {
                         MyElementIn = (Element) MyNodeList.item(0);
                         MyString = MyElementIn.getTextContent();
@@ -259,12 +257,12 @@ public class ImpAgency {
                         } else {
                             nbError++;
                             error = true;
-                            ErrorMsg = "Identifiant client non dÃ©fini";
+                            ErrorMsg = "Identifiant client non défini";
                         }
                     } else {
                         nbError++;
                         error = true;
-                        ErrorMsg = "Identifiant client non dÃ©fini";
+                        ErrorMsg = "Identifiant client non défini";
                     }
                     if (error) {
                         MyElementOut.setAttribute("erreur", ErrorMsg);
@@ -273,17 +271,17 @@ public class ImpAgency {
                         System.out.println("  WARNING : " + WarningMsg);
                     }
 
-                    // RÃ©cupÃ¨re le nom de l'agence
+                    // Récupère le nom de l'agence
                     ElementName = "nom";
                     error = false;
                     ErrorMsg = "";
                     warning = false;
-                    WarningMsg = "Nom d'agence non dÃ©fini";
+                    WarningMsg = "Nom d'agence non défini";
                     MyElementOut = MyDocumentOut.createElement(ElementName);
                     MyAgencyOut.appendChild(MyElementOut);
                     MyNodeList = OneAgency.getElementsByTagName(ElementName);
                     count = MyNodeList.getLength();
-//                    System.out.println("  " + count + " nom(s) trouvÃ©(s)");
+//                    System.out.println("  " + count + " nom(s) trouvé(s)");
                     if (count > 0) {
                         MyElementIn = (Element) MyNodeList.item(0);
                         MyString = MyElementIn.getTextContent();
@@ -301,17 +299,17 @@ public class ImpAgency {
                         System.out.println("  WARNING : " + WarningMsg);
                     }
 
-                    // RÃ©cupÃ¨re le nom abrÃ©gÃ© de l'agence
+                    // Récupère le nom abrégé de l'agence
                     ElementName = "codeAgence";
                     error = false;
-                    ErrorMsg = "Code agence non dÃ©fini";
+                    ErrorMsg = "Code agence non défini";
                     warning = false;
                     WarningMsg = "";
                     MyElementOut = MyDocumentOut.createElement(ElementName);
                     MyAgencyOut.appendChild(MyElementOut);
                     MyNodeList = OneAgency.getElementsByTagName(ElementName);
                     count = MyNodeList.getLength();
-//                    System.out.println("  " + count + " nom(s) abrÃ©gÃ©(s) trouvÃ©(s)");
+//                    System.out.println("  " + count + " nom(s) abrégé(s) trouvé(s)");
                     if (count > 0) {
                         MyElementIn = (Element) MyNodeList.item(0);
                         MyString = MyElementIn.getTextContent();
@@ -334,17 +332,17 @@ public class ImpAgency {
                         System.out.println("  WARNING : " + WarningMsg);
                     }
 
-                    // RÃ©cupÃ¨re l'appellation de l'agence
+                    // Récupère l'appellation de l'agence
                     ElementName = "appellationClient";
                     error = false;
                     ErrorMsg = "";
                     warning = false;
-                    WarningMsg = "Appellation non dÃ©finie";
+                    WarningMsg = "Appellation non définie";
                     MyElementOut = MyDocumentOut.createElement(ElementName);
                     MyAgencyOut.appendChild(MyElementOut);
                     MyNodeList = OneAgency.getElementsByTagName(ElementName);
                     count = MyNodeList.getLength();
-//                    System.out.println("  " + count + " appellation(s) trouvÃ©e(s)");
+//                    System.out.println("  " + count + " appellation(s) trouvée(s)");
                     if (count > 0) {
                         MyElementIn = (Element) MyNodeList.item(0);
                         MyString = MyElementIn.getTextContent();
@@ -362,17 +360,17 @@ public class ImpAgency {
                         System.out.println("  WARNING : " + WarningMsg);
                     }
 
-                    // RÃ©cupÃ¨re l'adresse de l'agence
+                    // Récupère l'adresse de l'agence
                     ElementName = "adresse";
                     error = false;
                     ErrorMsg = "";
                     warning = false;
-                    WarningMsg = "Adresse non dÃ©finie";
+                    WarningMsg = "Adresse non définie";
                     MyElementOut = MyDocumentOut.createElement(ElementName);
                     MyAgencyOut.appendChild(MyElementOut);
                     MyNodeList = OneAgency.getElementsByTagName(ElementName);
                     count = MyNodeList.getLength();
-//                    System.out.println("  " + count + " adresse(s) trouvÃ©e(s)");
+//                    System.out.println("  " + count + " adresse(s) trouvée(s)");
                     if (count > 0) {
                         MyElementIn = (Element) MyNodeList.item(0);
                         MyString = MyElementIn.getTextContent();
@@ -390,17 +388,17 @@ public class ImpAgency {
                         System.out.println("  WARNING : " + WarningMsg);
                     }
 
-                    // RÃ©cupÃ¨re le complÃ©ment d'adresse de l'agence
+                    // Récupère le complément d'adresse de l'agence
                     ElementName = "complement";
                     error = false;
                     ErrorMsg = "";
                     warning = false;
-                    WarningMsg = "ComplÃ©ment d'adresse non dÃ©fini";
+                    WarningMsg = "Complément d'adresse non défini";
                     MyElementOut = MyDocumentOut.createElement(ElementName);
                     MyAgencyOut.appendChild(MyElementOut);
                     MyNodeList = OneAgency.getElementsByTagName(ElementName);
                     count = MyNodeList.getLength();
-//                    System.out.println("  " + count + " complÃ©ment(s) adresse(s) trouvÃ©(s)");
+//                    System.out.println("  " + count + " complément(s) adresse(s) trouvé(s)");
                     if (count > 0) {
                         MyElementIn = (Element) MyNodeList.item(0);
                         MyString = MyElementIn.getTextContent();
@@ -418,17 +416,17 @@ public class ImpAgency {
                         System.out.println("  WARNING : " + WarningMsg);
                     }
 
-                    // RÃ©cupÃ¨re le code postal de l'agence
+                    // Récupère le code postal de l'agence
                     ElementName = "codePostal";
                     error = false;
                     ErrorMsg = "";
                     warning = false;
-                    WarningMsg = "Code postal non dÃ©fini";
+                    WarningMsg = "Code postal non défini";
                     MyElementOut = MyDocumentOut.createElement(ElementName);
                     MyAgencyOut.appendChild(MyElementOut);
                     MyNodeList = OneAgency.getElementsByTagName(ElementName);
                     count = MyNodeList.getLength();
-//                    System.out.println("  " + count + " code(s) postal/aux trouvÃ©(s)");
+//                    System.out.println("  " + count + " code(s) postal/aux trouvé(s)");
                     if (count > 0) {
                         MyElementIn = (Element) MyNodeList.item(0);
                         MyString = MyElementIn.getTextContent();
@@ -446,17 +444,17 @@ public class ImpAgency {
                         System.out.println("  WARNING : " + WarningMsg);
                     }
 
-                    // RÃ©cupÃ¨re la ville de l'agence
+                    // Récupère la ville de l'agence
                     ElementName = "ville";
                     error = false;
                     ErrorMsg = "";
                     warning = false;
-                    WarningMsg = "Ville non dÃ©finie";
+                    WarningMsg = "Ville non définie";
                     MyElementOut = MyDocumentOut.createElement(ElementName);
                     MyAgencyOut.appendChild(MyElementOut);
                     MyNodeList = OneAgency.getElementsByTagName(ElementName);
                     count = MyNodeList.getLength();
-//                    System.out.println("  " + count + " ville(s) trouvÃ©e(s)");
+//                    System.out.println("  " + count + " ville(s) trouvée(s)");
                     if (count > 0) {
                         MyElementIn = (Element) MyNodeList.item(0);
                         MyString = MyElementIn.getTextContent();
@@ -477,13 +475,13 @@ public class ImpAgency {
                     Phones = MyDocumentOut.createElement("telephones");
                     MyAgencyOut.appendChild(Phones);
 
-                    // RÃ©cupÃ©re les tÃ©lÃ©phones de l'agence
+                    // Récupére les téléphones de l'agence
                     ElementName = "telephone";
                     ErrorMsg = "";
-                    WarningMsg = "Type de tÃ©lÃ©phone inconnu";
+                    WarningMsg = "Type de téléphone inconnu";
                     MyNodeList = OneAgency.getElementsByTagName(ElementName);
                     count = MyNodeList.getLength();
-//                    System.out.println("  " + count + " tÃ©lÃ©phone(s) trouvÃ©(s)");
+//                    System.out.println("  " + count + " téléphone(s) trouvé(s)");
                     for (int j = 0; j < count; j++) {
                         error = false;
                         warning = false;
@@ -515,17 +513,17 @@ public class ImpAgency {
                         }
                     }
 
-                    // RÃ©cupÃ¨re l'email de l'agence
+                    // Récupère l'email de l'agence
                     ElementName = "email";
                     error = false;
                     ErrorMsg = "";
                     warning = false;
-                    WarningMsg = "Email non dÃ©fini";
+                    WarningMsg = "Email non défini";
                     MyElementOut = MyDocumentOut.createElement(ElementName);
                     MyAgencyOut.appendChild(MyElementOut);
                     MyNodeList = OneAgency.getElementsByTagName(ElementName);
                     count = MyNodeList.getLength();
-//                    System.out.println("  " + count + " email(s) trouvÃ©(s)");
+//                    System.out.println("  " + count + " email(s) trouvé(s)");
                     if (count > 0) {
                         MyElementIn = (Element) MyNodeList.item(0);
                         MyString = MyElementIn.getTextContent();
@@ -543,18 +541,18 @@ public class ImpAgency {
                         System.out.println("  WARNING : " + WarningMsg);
                     }
 
-                    // RÃ©cupÃ¨re l'activitÃ© de l'agence
+                    // Récupère l'activité de l'agence
                     MyFagency.setA6active(0);
                     ElementName = "actif";
                     error = false;
-                    ErrorMsg = "Code activitÃ© erronnÃ©";
+                    ErrorMsg = "Code activité erronné";
                     warning = false;
                     WarningMsg = "";
                     MyElementOut = MyDocumentOut.createElement(ElementName);
                     MyAgencyOut.appendChild(MyElementOut);
                     MyNodeList = OneAgency.getElementsByTagName(ElementName);
                     count = MyNodeList.getLength();
-//                    System.out.println("  " + count + " actif(s) trouvÃ©(s)");
+//                    System.out.println("  " + count + " actif(s) trouvé(s)");
                     if (count > 0) {
                         MyElementIn = (Element) MyNodeList.item(0);
                         MyString = MyElementIn.getTextContent();
@@ -579,18 +577,18 @@ public class ImpAgency {
                         System.out.println("  WARNING : " + WarningMsg);
                     }
 
-                    // RÃ©cupÃ¨re la date de dÃ©but d'activitÃ© de l'agence
+                    // Récupère la date de début d'activité de l'agence
                     MyFagency.setA6begactive(Now);
                     ElementName = "debut";
                     error = false;
-                    ErrorMsg = "Date de dÃ©but d'activite erronnÃ©e";
+                    ErrorMsg = "Date de début d'activite erronnée";
                     warning = false;
                     WarningMsg = "";
                     MyElementOut = MyDocumentOut.createElement(ElementName);
                     MyAgencyOut.appendChild(MyElementOut);
                     MyNodeList = OneAgency.getElementsByTagName(ElementName);
                     count = MyNodeList.getLength();
-//                    System.out.println("  " + count + " dÃ©but(s) trouvÃ©(s)");
+//                    System.out.println("  " + count + " début(s) trouvé(s)");
                     if (count > 0) {
                         MyElementIn = (Element) MyNodeList.item(0);
                         MyString = MyElementIn.getTextContent();
@@ -614,18 +612,18 @@ public class ImpAgency {
                         System.out.println("  WARNING : " + WarningMsg);
                     }
 
-                    // RÃ©cupÃ¨re la date de fin d'activitÃ© de l'agence
+                    // Récupère la date de fin d'activité de l'agence
                     MyFagency.setA6begactive(Future);
                     ElementName = "fin";
                     error = false;
-                    ErrorMsg = "Date de fin d'activite erronnÃ©e";
+                    ErrorMsg = "Date de fin d'activite erronnée";
                     warning = false;
                     WarningMsg = "";
                     MyElementOut = MyDocumentOut.createElement(ElementName);
                     MyAgencyOut.appendChild(MyElementOut);
                     MyNodeList = OneAgency.getElementsByTagName(ElementName);
                     count = MyNodeList.getLength();
-//                    System.out.println("  " + count + " fin(s) trouvÃ©(s)");
+//                    System.out.println("  " + count + " fin(s) trouvé(s)");
                     if (count > 0) {
                         MyElementIn = (Element) MyNodeList.item(0);
                         MyString = MyElementIn.getTextContent();
@@ -673,7 +671,7 @@ public class ImpAgency {
 
             // Output
             MyTransformer.transform(MySource, MyOutput);
-            System.out.println("Fichier Ã©lÃ©ment(s) Ã  retraiter " + FileOut);
+            System.out.println("Fichier élément(s) à retraiter " + FileOut);
 
         } catch (ParserConfigurationException MyException) {
             Logger.getLogger(ImpAgency.class.getName()).log(Level.SEVERE, null, MyException);
@@ -691,87 +689,88 @@ public class ImpAgency {
 
     }
 
-  /**
-   * @param MySourceServer : dÃ©finit le serveur source.
-   */
-  private void setSourceServer(String MySourceServer) {
-    this.SourceServer = MySourceServer;
-  }
+    /**
+     * @param MySourceServer : définit le serveur source.
+     */
+    private void setSourceServer(String MySourceServer) {
+        this.SourceServer = MySourceServer;
+    }
 
-  /**
-   * @param MyFileIn : dÃ©finit le fichier oÃ¹ prendre les donnÃ©es.
-   */
-  private void setFileIn(String MyFileIn) {
-    this.FileIn = MyFileIn;
-  }
+    /**
+     * @param MyFileIn : définit le fichier où prendre les données.
+     */
+    private void setFileIn(String MyFileIn) {
+        this.FileIn = MyFileIn;
+    }
 
-  /**
-   * @param MyFileOut : dÃ©finit le fichier oÃ¹ envoyer les rÃ©sultats.
-   */
-  private void setFileOut(String MyFileOut) {
-    this.FileOut = MyFileOut;
-  }
+    /**
+     * @param MyFileOut : définit le fichier où envoyer les résultats.
+     */
+    private void setFileOut(String MyFileOut) {
+        this.FileOut = MyFileOut;
+    }
 
-  /**
-    * debugMode : fonctionnement du programme en mode debug (true/false).
-   */
-  private void setDebugMode(boolean myDebugMode) {
-    this.debugMode = myDebugMode;
-  }
+    /**
+     * debugMode : fonctionnement du programme en mode debug (true/false).
+     */
+    private void setDebugMode(boolean myDebugMode) {
+        this.debugMode = myDebugMode;
+    }
 
-  /**
-    * testMode : fonctionnement du programme en mode test (true/false).
-   */
-  private void setTestMode(boolean myTestMode) {
-    this.testMode = myTestMode;
-  }
+    /**
+     * testMode : fonctionnement du programme en mode test (true/false).
+     */
+    private void setTestMode(boolean myTestMode) {
+        this.testMode = myTestMode;
+    }
 
-  /**
-   * @return SourceServer : retourne la valeur pour le serveur source.
-   */
-  private String getSourceServer() {
-    return(SourceServer);
-  }
+    /**
+     * @return SourceServer : retourne la valeur pour le serveur source.
+     */
+    private String getSourceServer() {
+        return (SourceServer);
+    }
 
-  /**
-   * @return FileIn : retourne le nom du fichier oÃ¹ prendre les donnÃ©es.
-   */
-  private String getFileIn() {
-    return(FileIn);
-  }
+    /**
+     * @return FileIn : retourne le nom du fichier où prendre les données.
+     */
+    private String getFileIn() {
+        return (FileIn);
+    }
 
-  /**
-   * @return FileOut : retourne le nom du fichier oÃ¹ envoyer les rÃ©sultats.
-   */
-  private String getFileOut() {
-    return(FileOut);
-  }
+    /**
+     * @return FileOut : retourne le nom du fichier où envoyer les résultats.
+     */
+    private String getFileOut() {
+        return (FileOut);
+    }
 
-  /**
-   * @return daemonMode : retourne le mode de fonctionnement debug.
-   */
-  private boolean getDebugMode() {
-    return(debugMode);
-  }
-  
-  /**
-   * @return testMode : retourne le mode de fonctionnement test.
-   */
-  private boolean getTestMode() {
-    return(testMode);
-  }
-  
-  /**
-   * RÃ©cupÃ¨re les arguments de la ligne de commande.
-   * @param Args arguments de la ligne de commande.
-   * @throws ImpAgencyException en cas d'erreur.
-   */
+    /**
+     * @return daemonMode : retourne le mode de fonctionnement debug.
+     */
+    private boolean getDebugMode() {
+        return (debugMode);
+    }
+
+    /**
+     * @return testMode : retourne le mode de fonctionnement test.
+     */
+    private boolean getTestMode() {
+        return (testMode);
+    }
+
+    /**
+     * Récupère les arguments de la ligne de commande.
+     *
+     * @param Args arguments de la ligne de commande.
+     * @throws ImpAgencyException en cas d'erreur.
+     */
     private void getArgs(String[] Args) throws ImpAgencyException {
 
-        String[] Errmsg = {"Erreur nÂ°1 : Mauvaise source de donnÃ©es",
-            "Erreur nÂ°2 : Mauvais fichier source",
-            "Erreur nÂ°3 : Mauvais fichier rÃ©sultat",
-            "Erreur nÂ°4 : Mauvais argument"};
+        String[] Errmsg = {"Erreur n°1 : Mauvaise source de données",
+            "Erreur n°2 : Mauvais fichier source",
+            "Erreur n°3 : Mauvais fichier résultat",
+            "Erreur n°4 : Mauvais argument"};
         String ErrorValue = "";
         int errNo = Errmsg.length;
         int i;
@@ -797,7 +796,7 @@ public class ImpAgency {
                     i = ip1;
                 } else {
                     errNo = 0;
-                    ErrorValue = "non dÃ©fini";
+                    ErrorValue = "non défini";
                 }
             } else if (Args[i].equals("-i")) {
                 if (ip1 < n) {
@@ -805,7 +804,7 @@ public class ImpAgency {
                     i = ip1;
                 } else {
                     errNo = 1;
-                    ErrorValue = "non dÃ©fini";
+                    ErrorValue = "non défini";
                 }
             } else if (Args[i].equals("-o")) {
                 if (ip1 < n) {
@@ -813,7 +812,7 @@ public class ImpAgency {
                     i = ip1;
                 } else {
                     errNo = 2;
-                    ErrorValue = "non dÃ©fini";
+                    ErrorValue = "non défini";
                 }
             } else if (Args[i].equals("-d")) {
                 setDebugMode(true);
@@ -830,17 +829,15 @@ public class ImpAgency {
             throw new ImpAgencyException(Errmsg[errNo] + " : " + ErrorValue);
         }
     }
-   
+
     /**
      * Les arguments en ligne de commande permettent de changer le mode de
-     * fonctionnement. 
-     * -i fichier : fichier dans lequel trouver les donnÃ©es de
-     * l'agence (obligatoire). 
-     * -o fichier : fichier vers lequel exporter les
-     * donnÃ©es de l'agence (optionnel, nom par dÃ©faut agences.xml). 
-     * -d : le programme fonctionne en mode dÃ©bug, il est plus verbeux (optionnel). 
-     * -t : le programme fonctionne en mode de test, les transactions en base de
-     * donnÃ©es ne sont pas exÃ©cutÃ©es (optionnel).
+     * fonctionnement. -i fichier : fichier dans lequel trouver les données de
+     * l'agence (obligatoire). -o fichier : fichier vers lequel exporter les
+     * données de l'agence (optionnel, nom par défaut agences.xml). -d : le
+     * programme fonctionne en mode débug, il est plus verbeux (optionnel). -t :
+     * le programme fonctionne en mode de test, les transactions en base de
+     * données ne sont pas exécutées (optionnel).
      *
      * @param Args arguments de la ligne de commande.
      */
@@ -851,11 +848,10 @@ public class ImpAgency {
 
         try {
             MyImpAgency = new ImpAgency(Args);
-        }
-        catch (Exception MyException) {
-            System.out.println("ProblÃ¨me lors du lancement de ImpAgency" + MyException);
+        } catch (Exception MyException) {
+            System.out.println("Problème lors du lancement de ImpAgency" + MyException);
         }
 
-        System.out.println("Traitement terminÃ©.");
+        System.out.println("Traitement terminé.");
     }
 }

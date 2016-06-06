@@ -1,19 +1,19 @@
 # Projet import d'agences
 
-Le but de ce projet est de crÃ©er un programme Java permettant d'importer les agences d'un service d'urgence au format XML dans une base de donnÃ©es.
+Le but de ce projet est de créer un programme Java permettant d'importer les agences d'un service d'urgence au format XML dans une base de données.
 
 ##Utilisation:
 ```
-java ExpAgncy -i fichier_entrÃ©e.xml -o fichier_sortie.xml -d -t 
-
--i fichier_entrÃ©e.xml est le nom du fichier qui contient les agences Ã  charger au format XML.
--o fichier_sortie.xml est le nom du fichier qui recevra les rÃ©sultats du chargement des agences au format XML.
--d le programme s'exÃ©cute en mode dÃ©bug, il est beaucoup plus verbeux.
--t le programme s'exÃ©cute en mod test, les transcations en base de donnÃ©es ne sont pas faites.
+java ImpAgency -i fichier_entrée.xml -o fichier_sortie.xml [-d] [-t] 
 ```
+où :
+* ```-i fichier_entrée.xml``` est le nom du fichier qui contient les agences à charger au format XML (paramètre obligatoire).
+* ```-o fichier_sortie.xml``` est le nom du fichier qui recevra les résultats du chargement des agences au format XML (paramètre obligatoire).
+* ```-d``` le programme s'exécute en mode débug, il est beaucoup plus verbeux. Désactivé par défaut (paramètre optionnel).
+* ```-t``` le programme s'exécute en mode test, les transcations en base de données ne sont pas faites. Désactivé par défaut (paramètre optionnel).
 
-##PrÃ©-requis :
-- Java 6 ou supÃ©rieur.
+##Pré-requis :
+- Java 6 ou supérieur.
 - JDBC Informix
 - JDBC MySql
 
@@ -30,8 +30,8 @@ java ExpAgncy -i fichier_entrÃ©e.xml -o fichier_sortie.xml -d -t
     <nom>utopia</nom>
     <codeAgence>UTOPIA</codeAgence>
     <appellationClient>terra incognita</appellationClient>
-    <adresse>12, rue des rÃ¨ves</adresse>
-    <complement>bÃ¢timent B</complement>
+    <adresse>12, rue des rèves</adresse>
+    <complement>bâtiment B</complement>
     <codePostal>92400</codePostal>
     <ville>UTOPIA CITY</ville>
     <email>utopia@gmail.com</email>
@@ -91,7 +91,19 @@ Nom du fichier : *agences.dtd*
 <!ELEMENT fin (#PCDATA)>
 ```
 
-##RÃ©fÃ©rences:
+##Fichier des paramètres : 
+
+Ce fichier permet de spécifier les paramètres d'accès aux différentes bases de données.
+
+A adapter selon les implémentations locales.
+
+Ce fichier est nommé : *MyDatabases.prop*.
+
+Le fichier *MyDatabases_Example.prop* est fourni à titre d'exemple.
+
+##Références:
+
+- Construire une application XML, J.C. Bernadac, F. Knab, Eyrolles.
 
 - [OpenClassroom Java XML](https://openclassrooms.com/courses/structurez-vos-donnees-avec-xml/dom-exemple-d-utilisation-en-java)
 - [Syntaxe Markdown](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)
@@ -99,52 +111,5 @@ Nom du fichier : *agences.dtd*
 - [Tuto W3C sur DTD (en)](https://www.google.fr/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&sqi=2&ved=0ahUKEwiDrurll-fMAhWHBsAKHYdzAegQFggfMAA&url=http%3A%2F%2Fwww.w3schools.com%2Fxml%2Fxml_dtd_intro.asp&usg=AFQjCNGCt7X2oRyUSkTES1aXf8GljqhekA&bvm=bv.122448493,d.ZGg)
 - [Validation fichier XML](http://www.xmlvalidation.com/)
 - [Convertisseur DTD/XSD](http://www.freeformatter.com/xsd-generator.html)
-
-##Fichier des paramÃ¨tres : 
-
-Ce fichier permert de spÃ©cifier les paramÃ¨tres d'accÃ¨s aux diffÃ©rentes bases de donnÃ©es.
-
-A adapter selon les implÃ©mentations locales.
-
-Ce fichier est nommÃ© : *ImpAgencyPublic.prop*
-```
-# Properties for production environnement
-prod.dbserver.name=eole
-prod.dbserver.ip=1.2.3.4
-prod.dbserver.port=1234
-prod.dbserver.dbname=bdd
-prod.dbserver.login=user
-prod.dbserver.passwd=passwd
-prod.dbserver.informixserver=bdd
-prod.dbserver.drivername=Informix
-prod.dbserver.driverclass=com.informix.jdbc.IfxDriver
-prod.dbserver.nb.thread=8
-
-# No pre-prod dbserver for Anstel
-
-# Properties for development environnement
-dev.dbserver.name=zephir
-dev.dbserver.ip=1.2.3.5
-dev.dbserver.port=1235
-dev.dbserver.dbname=bdd
-dev.dbserver.login=user
-dev.dbserver.passwd=passwd
-dev.dbserver.informixserver=bdd
-dev.dbserver.drivername=Informix
-dev.dbserver.driverclass=com.informix.jdbc.IfxDriver
-dev.dbserver.nb.thread=8
-
-# Properties for MySQL development environnement
-mysql.dbserver.name=vmsrv
-mysql.dbserver.ip=localhost
-mysql.dbserver.port=1234
-mysql.dbserver.dbname=bdd
-mysql.dbserver.login=user
-mysql.dbserver.passwd=passwd
-mysql.dbserver.drivername=MySQL
-mysql.dbserver.driverclass=com.mysql.jdbc.Driver
-mysql.dbserver.nb.thread=8
-```
-
-
+- [Tuto XML/XSD](http://www.codeguru.com/java/article.php/c13529/XSD-Tutorial-XML-Schemas-For-Beginners.htm)
 
