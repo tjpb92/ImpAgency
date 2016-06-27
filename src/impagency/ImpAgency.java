@@ -29,7 +29,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-/*
+/**
  * Ce programme importe les agences décrites dans un fichier au format XML
  * dans la base de données.
  * @version Juin 2016
@@ -77,9 +77,9 @@ public class ImpAgency {
      * données ne sont pas exécutées (optionnel).
      *
      * @param Args arguments de la ligne de commande.
-     * @throws impagency.ImpAgencyException
-     * @throws java.io.IOException
-     * @throws utils.DBServerException
+     * @throws impagency.ImpAgencyException en cas de problème lors du lancement de ImpAgency.
+     * @throws java.io.IOException en cas de fichier non lisible ou absent.
+     * @throws utils.DBServerException en cas de propriété incorrecte.
      */
     public ImpAgency(String[] Args) throws ImpAgencyException, IOException, DBServerException {
 
@@ -711,14 +711,14 @@ public class ImpAgency {
     }
 
     /**
-     * debugMode : fonctionnement du programme en mode debug (true/false).
+     * @param myDebugMode : fonctionnement du programme en mode debug (true/false).
      */
     private void setDebugMode(boolean myDebugMode) {
         this.debugMode = myDebugMode;
     }
 
     /**
-     * testMode : fonctionnement du programme en mode test (true/false).
+     * @param myTestMode : fonctionnement du programme en mode test (true/false).
      */
     private void setTestMode(boolean myTestMode) {
         this.testMode = myTestMode;
